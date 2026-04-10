@@ -19,16 +19,33 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  font-family: Arial, sans-serif;
 }
 
 body {
-  font-family: Arial, sans-serif;
-  background: var(--bg);
+  background:
+    linear-gradient(rgba(239, 229, 219, 0.78), rgba(239, 229, 219, 0.78)),
+    linear-gradient(180deg, #efe5db 0%, #f6f1eb 100%);
   color: var(--text);
-  line-height: 1.5;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a,
+button,
+input,
+select {
+  max-width: 100%;
 }
 
 /* HERO */
@@ -41,7 +58,7 @@ body {
   max-width: 1280px;
   margin: 0 auto;
   background: var(--accent);
-  border-radius: 24px;
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow);
   padding: 18px 20px;
 }
@@ -49,12 +66,12 @@ body {
 .hero-top {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
+  gap: 14px;
   align-items: center;
 }
 
 .hero-copy {
-  color: white;
+  color: #ffffff;
 }
 
 .hero-kicker {
@@ -78,48 +95,50 @@ body {
   opacity: 0.96;
 }
 
-.hero-icon-box {
+.hero-cz-wrap {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.hero-pin {
-  width: 92px;
-  height: 92px;
-  display: block;
+.hero-cz-image {
+  width: 180px;
+  max-width: 100%;
+  height: auto;
 }
 
-/* MAIN LAYOUT */
+/* APP LAYOUT */
 
 .app-shell {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 12px 14px 24px;
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
+  padding: 12px;
+  max-width: 1280px;
+  margin: 0 auto 24px auto;
 }
 
 .panel {
   background: var(--panel);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow);
+  border: 1px solid var(--border);
   overflow: hidden;
 }
 
 .panel-left,
 .panel-right {
+  min-width: 0;
+}
+
+.panel-right {
   display: flex;
   flex-direction: column;
+  gap: 16px;
 }
 
 .panel-section {
   padding: 16px;
-}
-
-.panel-section + .panel-section {
-  border-top: 1px solid var(--border);
 }
 
 .section-header {
@@ -128,8 +147,8 @@ body {
 
 .section-header h2,
 .controls-section h2 {
-  margin: 0;
-  font-size: 20px;
+  margin: 0 0 12px 0;
+  font-size: 1.2rem;
   color: var(--accent);
 }
 
@@ -177,6 +196,7 @@ label {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
 }
 
 #seznam-pamatek li:hover {
@@ -187,12 +207,20 @@ label {
 
 /* MAP */
 
+.map-section {
+  width: 100%;
+}
+
 #map {
   width: 100%;
   height: 340px;
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 2px solid var(--accent);
+}
+
+.leaflet-popup-content strong {
+  color: var(--accent);
 }
 
 /* DETAIL */
@@ -213,16 +241,26 @@ label {
   margin-bottom: 12px;
   font-size: 22px;
   color: var(--accent);
+  word-break: break-word;
 }
 
-#detail-pamatky p {
+#detail-pamatky h4 {
+  margin: 18px 0 10px 0;
+  color: var(--accent);
+  font-size: 18px;
+}
+
+#detail-pamatky p,
+#detail-pamatky li {
   margin: 8px 0;
+  overflow-wrap: break-word;
 }
 
 #detail-pamatky a {
   color: var(--accent);
   font-weight: bold;
   text-decoration: none;
+  overflow-wrap: break-word;
 }
 
 #detail-pamatky a:hover {
@@ -239,82 +277,40 @@ label {
   border: 1px solid var(--border);
 }
 
-.leaflet-popup-content strong {
+.prezentacni-text {
+  margin: 0 0 14px 0;
+  padding: 12px 14px;
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+}
+
+.souvisejici-blok {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.souvisejici-seznam {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.souvisejici-seznam li {
+  margin-bottom: 8px;
+}
+
+.souvisejici-link {
   color: var(--accent);
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.souvisejici-link:hover {
+  text-decoration: underline;
 }
 
 /* TABLET */
-
-@media (min-width: 768px) {
-  .hero {
-  padding: 14px 14px 8px;
-}
-
-.hero-card {
-  max-width: 1280px;
-  margin: 0 auto;
-  background: var(--accent);
-  border-radius: 24px;
-  box-shadow: var(--shadow);
-  padding: 18px 20px;
-}
-
-.hero-top {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-  align-items: center;
-}
-
-.hero-copy {
-  color: white;
-}
-
-.hero-kicker {
-  margin: 0 0 6px 0;
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  opacity: 0.92;
-}
-
-.hero h1 {
-  margin: 0 0 8px 0;
-  font-size: 30px;
-  line-height: 1.08;
-}
-
-.hero-text {
-  margin: 0;
-  max-width: 760px;
-  font-size: 15px;
-  opacity: 0.96;
-}
-
-.hero-cz-wrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.hero-cz-image {
-  width: 180px;
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-@media (min-width: 768px) {
-  .hero-cz-image {
-    width: 220px;
-  }
-}
-
-.hero-cz {
-  width: 180px;
-  height: auto;
-  display: block;
-}
 
 @media (min-width: 768px) {
   .hero {
@@ -338,10 +334,9 @@ label {
     font-size: 16px;
   }
 
-  .hero-cz {
+  .hero-cz-image {
     width: 220px;
   }
-}
 
   .app-shell {
     padding: 14px 20px 28px;
@@ -350,6 +345,81 @@ label {
 
   #map {
     height: 420px;
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-left,
+  .panel-right {
+    width: 100%;
+  }
+
+  #map {
+    height: 300px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 10px 10px 6px;
+  }
+
+  .hero-card {
+    padding: 16px 14px;
+    border-radius: 18px;
+  }
+
+  .hero h1 {
+    font-size: 24px;
+  }
+
+  .hero-text {
+    font-size: 14px;
+  }
+
+  .hero-cz-image {
+    width: 150px;
+  }
+
+  .app-shell {
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .panel {
+    border-radius: 14px;
+  }
+
+  .panel-section {
+    padding: 12px;
+  }
+
+  .section-header h2,
+  .controls-section h2 {
+    font-size: 1.05rem;
+  }
+
+  #map {
+    height: 240px;
+  }
+
+  #vyhledavani,
+  #filtr-kraj {
+    font-size: 16px;
+  }
+
+  #detail-pamatky {
+    padding: 12px;
+  }
+
+  #detail-pamatky h3 {
+    font-size: 20px;
   }
 }
 
@@ -365,6 +435,8 @@ label {
     position: sticky;
     top: 16px;
     max-height: calc(100vh - 32px);
+    display: flex;
+    flex-direction: column;
   }
 
   .controls-section {
@@ -389,41 +461,4 @@ label {
   #detail-pamatky {
     min-height: 280px;
   }
-}
-.souvisejici-blok {
-  margin-top: 18px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-}
-
-.souvisejici-blok h4 {
-  margin: 0 0 10px 0;
-  color: var(--accent);
-  font-size: 18px;
-}
-
-.souvisejici-seznam {
-  margin: 0;
-  padding-left: 18px;
-}
-
-.souvisejici-seznam li {
-  margin-bottom: 8px;
-}
-
-.souvisejici-link {
-  color: var(--accent);
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.souvisejici-link:hover {
-  text-decoration: underline;
-}
-.prezentacni-text {
-  margin: 0 0 14px 0;
-  padding: 12px 14px;
-  background: var(--accent-soft);
-  border-left: 4px solid var(--accent);
-  border-radius: 8px;
 }

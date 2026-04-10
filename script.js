@@ -1,6 +1,6 @@
 let pamatky = [];
-let mapa;
-let vrstvaMarkeru;
+let mapa = null;
+let vrstvaMarkeru = null;
 
 const seznam = document.getElementById("seznam-pamatek");
 const detail = document.getElementById("detail-pamatky");
@@ -20,7 +20,7 @@ function vytvorSlug(text) {
 function vytvorIdPamatky(pamatka) {
   const cast1 = vytvorSlug(pamatka.nazev);
   const cast2 = vytvorSlug(pamatka.mesto);
-  return `${cast1}-${cast2}`;
+  return `${cast1}-${cast2}`.replace(/^-+|-+$/g, "");
 }
 
 function ziskejIdZUrl() {
@@ -29,9 +29,62 @@ function ziskejIdZUrl() {
 }
 
 function nastavUrlProPamatku(pamatka) {
-  const id = pamatka._id;
-  const novaUrl = `${window.location.pathname}?id=${encodeURIComponent(id)}`;
-  window.history.replaceState({}, "", novaUrl);
+  if (!pamatka || !pamatka.id) return;
+
+  const url = new URL(window.location.href);
+  url.searchParams.set("id", pamatka.id);
+  window.history.replaceState({}, "", url.toString());
+}
+
+function jePlatneCislo(hodnota) {
+  return typeof hodnota === "number" && Number.isFinite(hodnota);
+}
+
+function maPlatneSouradnice(pamatka) {
+  return jePlatneCislo(pamatka.lat) && jePlatneCislo(pamatka.lng);
+}
+
+function escapeHtml(text) {
+  return String(text ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function jePrimyOdkazNaObrazek(url) {
+  if (!url || typeof url !== "string") return false;
+  return /\.(jpg|jpeg|png|webp|gif|avif|svg)(\?.*)?$/i.test(url);
+}
+
+function normalizujPamatku(pamatka) {
+  const lat = jePlatneCislo(pamatka.lat)
+    ? pamatka.lat
+    : (typeof pamatka.lat === "string" && pamatka.lat.trim() !== "" ? Number(pamatka.lat) : null);
+
+  const lngZdroj = pamatka.lng ?? pamatka.lon ?? null;
+  const lng = jePlatneCislo(lngZdroj)
+    ? lngZdroj
+    : (typeof lngZdroj === "string" && lngZdroj.trim() !== "" ? Number(lngZdroj) : null);
+
+  return {
+    id: pamatka.id || vytvorIdPamatky(pamatka),
+    nazev: pamatka.nazev || "Bez názvu",
+    typ: pamatka.typ || "",
+    mesto: pamatka.mesto || "",
+    kraj: pamatka.kraj || "",
+    lokalita: pamatka.lokalita || "",
+    rok: pamatka.rok || "",
+    epidemie: pamatka.epidemie || "",
+    duvod: pamatka.duvod || "",
+    ikonografie: pamatka.ikonografie || "",
+    patroni: pamatka.patroni || "",
+    foto: pamatka.foto || "",
+    zdroj: pamatka.zdroj || "",
+    lat: Number.isFinite(lat) ? lat : null,
+    lng: Number.isFinite(lng) ? lng : null
+  };
 }
 
 function vytvorPrezentacniText(p) {
@@ -52,7 +105,8 @@ function vytvorPrezentacniText(p) {
   }
 
   if (p.duvod) {
-    casti.push(`Jejím smyslem bylo ${p.duvod.charAt(0).toLowerCase()}${p.duvod.slice(1)}.`);
+    const duvodText = p.duvod.charAt(0).toLowerCase() + p.duvod.slice(1);
+    casti.push(`Jejím smyslem bylo ${duvodText}.`);
   }
 
   if (p.ikonografie) {
@@ -65,74 +119,84 @@ function vytvorPrezentacniText(p) {
 function zobrazSeznam(filtrovanePamatky = pamatky) {
   seznam.innerHTML = "";
 
-  filtrovanePamatky.forEach((pamatka) => {
-    const puvodniIndex = pamatky.indexOf(pamatka);
+  if (!filtrovanePamatky.length) {
+    const prazdnaPolozka = document.createElement("li");
+    prazdnaPolozka.textContent = "Nebyla nalezena žádná památka.";
+    seznam.appendChild(prazdnaPolozka);
+    return;
+  }
 
+  filtrovanePamatky.forEach((pamatka) => {
     const polozka = document.createElement("li");
     polozka.textContent = `${pamatka.nazev} – ${pamatka.mesto}`;
-    polozka.style.cursor = "pointer";
-
     polozka.addEventListener("click", () => {
-      zobrazDetail(puvodniIndex);
+      zobrazDetailPodleId(pamatka.id);
       nastavUrlProPamatku(pamatka);
     });
-
     seznam.appendChild(polozka);
   });
 }
 
-function vzdalenostKm(lat1, lon1, lat2, lon2) {
+function vzdalenostKm(lat1, lng1, lat2, lng2) {
   const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
 
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * Math.PI / 180) *
-    Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
 
 function najdiSouvisejiciPamatky(aktualniPamatka, pocet = 3) {
-  if (!aktualniPamatka.lat || !aktualniPamatka.lon) {
+  if (!maPlatneSouradnice(aktualniPamatka)) {
     return [];
   }
 
   return pamatky
-    .filter((p) => p._id !== aktualniPamatka._id && p.lat && p.lon)
+    .filter((p) => p.id !== aktualniPamatka.id && maPlatneSouradnice(p))
     .map((p) => ({
       ...p,
       vzdalenost: vzdalenostKm(
         aktualniPamatka.lat,
-        aktualniPamatka.lon,
+        aktualniPamatka.lng,
         p.lat,
-        p.lon
+        p.lng
       )
     }))
     .sort((a, b) => a.vzdalenost - b.vzdalenost)
     .slice(0, pocet);
 }
 
-function vytvorHtmlSouvisejicichPamatok(aktualniPamatka) {
+function vytvorHtmlSouvisejicichPamatek(aktualniPamatka) {
   const souvisejici = najdiSouvisejiciPamatky(aktualniPamatka);
 
   if (souvisejici.length === 0) {
-    return `<p><em>Další památky v okolí nejsou k dispozici.</em></p>`;
+    return `
+      <div class="souvisejici-blok">
+        <h4>Další památky v okolí</h4>
+        <p><em>Další památky v okolí nejsou k dispozici.</em></p>
+      </div>
+    `;
   }
 
-  const polozky = souvisejici.map((p) => {
-    return `
-      <li>
-        <a href="?id=${encodeURIComponent(p._id)}" class="souvisejici-link" data-id="${p._id}">
-          ${p.nazev} – ${p.mesto}
-        </a>
-        <span>(${p.vzdalenost.toFixed(1)} km)</span>
-      </li>
-    `;
-  }).join("");
+  const polozky = souvisejici
+    .map((p) => {
+      return `
+        <li>
+          <a href="?id=${encodeURIComponent(p.id)}" class="souvisejici-link" data-id="${escapeHtml(p.id)}">
+            ${escapeHtml(p.nazev)} – ${escapeHtml(p.mesto)}
+          </a>
+          <span>(${p.vzdalenost.toFixed(1)} km)</span>
+        </li>
+      `;
+    })
+    .join("");
 
   return `
     <div class="souvisejici-blok">
@@ -144,49 +208,102 @@ function vytvorHtmlSouvisejicichPamatok(aktualniPamatka) {
   `;
 }
 
-function zobrazDetail(index) {
-  const p = pamatky[index];
-  const prezentacniText = vytvorPrezentacniText(p);
+function vytvorBlokFotografie(p) {
+  if (!p.foto) {
+    return `<p><em>Obrázek není k dispozici.</em></p>`;
+  }
 
-  const navigaceOdkaz =
-    p.lat && p.lon
-      ? `<p><a href="https://www.google.com/maps?q=${p.lat},${p.lon}" target="_blank" rel="noopener noreferrer">Navigovat k památce</a></p>`
-      : `<p><em>Navigace není k dispozici.</em></p>`;
+  if (jePrimyOdkazNaObrazek(p.foto)) {
+    return `<img src="${escapeHtml(p.foto)}" alt="${escapeHtml(p.nazev)}" onerror="this.outerHTML='&lt;p&gt;&lt;em&gt;Obrázek není k dispozici.&lt;/em&gt;&lt;/p&gt;'">`;
+  }
 
-  const odkazNaZdroj = p.zdroj
-    ? `<p><strong>Zdroj:</strong> <a href="${p.zdroj}" target="_blank" rel="noopener noreferrer">${p.zdroj}</a></p>`
-    : `<p><strong>Zdroj:</strong> Neuvedeno</p>`;
+  return `
+    <p><em>Přímý obrázek není k dispozici.</em></p>
+    <p>
+      <a href="${escapeHtml(p.foto)}" target="_blank" rel="noopener noreferrer">
+        Otevřít zdrojovou stránku / fotografii
+      </a>
+    </p>
+  `;
+}
+
+function vytvorBlokZdroje(p) {
+  const casti = [];
+
+  if (p.zdroj) {
+    casti.push(`<p><strong>Zdroj:</strong> ${escapeHtml(p.zdroj)}</p>`);
+  } else {
+    casti.push(`<p><strong>Zdroj:</strong> Neuvedeno</p>`);
+  }
+
+  if (p.foto && !jePrimyOdkazNaObrazek(p.foto)) {
+    casti.push(`
+      <p>
+        <strong>Odkaz:</strong>
+        <a href="${escapeHtml(p.foto)}" target="_blank" rel="noopener noreferrer">
+          Otevřít externí stránku
+        </a>
+      </p>
+    `);
+  }
+
+  return casti.join("");
+}
+
+function vytvorBlokNavigace(p) {
+  if (!maPlatneSouradnice(p)) {
+    return `<p><em>Navigace není k dispozici.</em></p>`;
+  }
+
+  return `
+    <p>
+      <a href="https://www.google.com/maps?q=${encodeURIComponent(`${p.lat},${p.lng}`)}" target="_blank" rel="noopener noreferrer">
+        Navigovat k památce
+      </a>
+    </p>
+  `;
+}
+
+function zobrazDetailPodleId(id) {
+  const pamatka = pamatky.find((p) => p.id === id);
+
+  if (!pamatka) {
+    detail.innerHTML = `<p><em>Požadovaná památka nebyla nalezena.</em></p>`;
+    return;
+  }
+
+  const prezentacniText = vytvorPrezentacniText(pamatka);
 
   detail.innerHTML = `
-    <h3>${p.nazev}</h3>
-    <p class="prezentacni-text">${prezentacniText}</p>
-    <p><strong>Typ památky:</strong> ${p.typ || "Neuvedeno"}</p>
-    <p><strong>Město:</strong> ${p.mesto || "Neuvedeno"}</p>
-    <p><strong>Lokalita:</strong> ${p.lokalita || "Neuvedeno"}</p>
-    <p><strong>Kraj:</strong> ${p.kraj || "Neuvedeno"}</p>
-    <p><strong>Rok / období vzniku:</strong> ${p.rok || "Neuvedeno"}</p>
-    <p><strong>Epidemie:</strong> ${p.epidemie || "Neuvedeno"}</p>
-    <p><strong>Důvod vzniku:</strong> ${p.duvod || "Neuvedeno"}</p>
-    <p><strong>Hlavní ikonografie:</strong> ${p.ikonografie || "Neuvedeno"}</p>
-    ${odkazNaZdroj}
-    ${navigaceOdkaz}
-    ${
-      p.foto
-        ? `<img src="${p.foto}" alt="${p.nazev}" onerror="this.outerHTML='<p><em>Obrázek není k dispozici.</em></p>'">`
-        : `<p><em>Obrázek není k dispozici.</em></p>`
-    }
-    ${vytvorHtmlSouvisejicichPamatok(p)}
+    <h3>${escapeHtml(pamatka.nazev)}</h3>
+    <p class="prezentacni-text">${escapeHtml(prezentacniText || "K této památce zatím není připraven stručný prezentační text.")}</p>
+    <p><strong>Typ památky:</strong> ${escapeHtml(pamatka.typ || "Neuvedeno")}</p>
+    <p><strong>Město:</strong> ${escapeHtml(pamatka.mesto || "Neuvedeno")}</p>
+    <p><strong>Lokalita:</strong> ${escapeHtml(pamatka.lokalita || "Neuvedeno")}</p>
+    <p><strong>Kraj:</strong> ${escapeHtml(pamatka.kraj || "Neuvedeno")}</p>
+    <p><strong>Rok / období vzniku:</strong> ${escapeHtml(pamatka.rok || "Neuvedeno")}</p>
+    <p><strong>Epidemie:</strong> ${escapeHtml(pamatka.epidemie || "Neuvedeno")}</p>
+    <p><strong>Důvod vzniku:</strong> ${escapeHtml(pamatka.duvod || "Neuvedeno")}</p>
+    <p><strong>Hlavní ikonografie:</strong> ${escapeHtml(pamatka.ikonografie || "Neuvedeno")}</p>
+    <p><strong>Patroni:</strong> ${escapeHtml(pamatka.patroni || "Neuvedeno")}</p>
+    ${vytvorBlokZdroje(pamatka)}
+    ${vytvorBlokNavigace(pamatka)}
+    ${vytvorBlokFotografie(pamatka)}
+    ${vytvorHtmlSouvisejicichPamatek(pamatka)}
   `;
 
   const odkazy = detail.querySelectorAll(".souvisejici-link");
   odkazy.forEach((odkaz) => {
     odkaz.addEventListener("click", (event) => {
       event.preventDefault();
-      const id = odkaz.dataset.id;
-      const novyIndex = pamatky.findIndex((pamatka) => pamatka._id === id);
-      if (novyIndex !== -1) {
-        zobrazDetail(novyIndex);
-        nastavUrlProPamatku(pamatky[novyIndex]);
+      const idPam = odkaz.dataset.id;
+      zobrazDetailPodleId(idPam);
+      const p = pamatky.find((item) => item.id === idPam);
+      if (p) {
+        nastavUrlProPamatku(p);
+        if (maPlatneSouradnice(p) && mapa) {
+          mapa.setView([p.lat, p.lng], 14);
+        }
       }
     });
   });
@@ -195,7 +312,9 @@ function zobrazDetail(index) {
 function naplnFiltrKraju() {
   filtrKraj.innerHTML = '<option value="">Všechny kraje</option>';
 
-  const kraje = [...new Set(pamatky.map((p) => p.kraj).filter(Boolean))].sort();
+  const kraje = [...new Set(pamatky.map((p) => p.kraj).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b, "cs")
+  );
 
   kraje.forEach((kraj) => {
     const moznost = document.createElement("option");
@@ -217,60 +336,89 @@ function inicializujMapu() {
 }
 
 function aktualizujMapu(filtrovanePamatky) {
+  if (!vrstvaMarkeru || !mapa) return;
+
   vrstvaMarkeru.clearLayers();
 
+  const body = [];
+
   filtrovanePamatky.forEach((pamatka) => {
-    if (pamatka.lat && pamatka.lon) {
-      const puvodniIndex = pamatky.indexOf(pamatka);
-
-      const marker = L.marker([pamatka.lat, pamatka.lon]).addTo(vrstvaMarkeru);
-
-      marker.bindPopup(`<strong>${pamatka.nazev}</strong><br>${pamatka.mesto}`);
-
-      marker.on("click", () => {
-        zobrazDetail(puvodniIndex);
-        nastavUrlProPamatku(pamatka);
-      });
+    if (!maPlatneSouradnice(pamatka)) {
+      return;
     }
+
+    body.push([pamatka.lat, pamatka.lng]);
+
+    const marker = L.marker([pamatka.lat, pamatka.lng]).addTo(vrstvaMarkeru);
+
+    marker.bindPopup(`<strong>${escapeHtml(pamatka.nazev)}</strong><br>${escapeHtml(pamatka.mesto)}`);
+
+    marker.on("click", () => {
+      zobrazDetailPodleId(pamatka.id);
+      nastavUrlProPamatku(pamatka);
+    });
   });
+
+  if (body.length === 1) {
+    mapa.setView(body[0], 12);
+  } else if (body.length > 1) {
+    mapa.fitBounds(body, { padding: [30, 30] });
+  } else {
+    mapa.setView([49.8, 15.5], 7);
+  }
 }
 
 function aplikujFiltry() {
-  const hledanyText = vyhledavani.value.toLowerCase();
+  const hledanyText = (vyhledavani.value || "").toLowerCase().trim();
   const vybranyKraj = filtrKraj.value;
 
   const filtrovane = pamatky.filter((pamatka) => {
-    const odpovidaTextu =
-      pamatka.nazev.toLowerCase().includes(hledanyText) ||
-      pamatka.mesto.toLowerCase().includes(hledanyText);
+    const textProHledani = `${pamatka.nazev} ${pamatka.mesto} ${pamatka.lokalita} ${pamatka.typ}`.toLowerCase();
 
-    const odpovidaKraji =
-      vybranyKraj === "" || pamatka.kraj === vybranyKraj;
+    const odpovidaTextu = textProHledani.includes(hledanyText);
+    const odpovidaKraji = vybranyKraj === "" || pamatka.kraj === vybranyKraj;
 
     return odpovidaTextu && odpovidaKraji;
   });
 
   zobrazSeznam(filtrovane);
   aktualizujMapu(filtrovane);
+
+  const idZUrl = ziskejIdZUrl();
+  if (idZUrl) {
+    const existujeVeFiltru = filtrovane.some((p) => p.id === idZUrl);
+    if (!existujeVeFiltru && filtrovane.length > 0) {
+      detail.innerHTML = `<p><em>Aktuálně vybraná památka neodpovídá nastavenému filtru.</em></p>`;
+    }
+  }
 }
 
 function otevriPamatkuZUrl() {
   const idZUrl = ziskejIdZUrl();
   if (!idZUrl) return;
 
-  const index = pamatky.findIndex((p) => p._id === idZUrl);
-  if (index !== -1) {
-    zobrazDetail(index);
+  const pamatka = pamatky.find((p) => p.id === idZUrl);
+  if (!pamatka) {
+    detail.innerHTML = `<p><em>Požadovaná památka nebyla nalezena.</em></p>`;
+    return;
+  }
+
+  zobrazDetailPodleId(idZUrl);
+
+  if (maPlatneSouradnice(pamatka) && mapa) {
+    mapa.setView([pamatka.lat, pamatka.lng], 14);
   }
 }
 
 fetch("data.json")
-  .then((response) => response.json())
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`Nepodařilo se načíst data.json (HTTP ${response.status})`);
+    }
+    return response.json();
+  })
   .then((data) => {
-    pamatky = data.map((pamatka) => ({
-      ...pamatka,
-      _id: vytvorIdPamatky(pamatka)
-    }));
+    pamatky = data.map(normalizujPamatku);
 
     zobrazSeznam();
     naplnFiltrKraju();
@@ -279,6 +427,7 @@ fetch("data.json")
   })
   .catch((error) => {
     console.error("Chyba při načítání dat:", error);
+    detail.innerHTML = `<p><em>Data se nepodařilo načíst.</em></p>`;
   });
 
 vyhledavani.addEventListener("input", aplikujFiltry);
