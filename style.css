@@ -1,13 +1,14 @@
 :root {
   --wall-grey: #8a8780;
   --kombu-green: #3f5546;
-  --brick-clay: #9B5416;
+  --burnt-sienna: #9B5416;
   --mist-white: #f4f1ec;
+  --blush: #e9d8cf;
 
-  --panel-left-bg: #ebe7e1;
-  --panel-right-bg: #ebe7e1;
+  --panel-left-bg: #9B5416;
+  --panel-right-bg: #efe7e0;
   --panel-white: #ffffff;
-  --panel-soft: #f7f4ef;
+  --panel-soft: #f7f1eb;
 
   --text: #1f1f1f;
   --text-soft: #5a5a5a;
@@ -33,7 +34,7 @@ body {
 }
 
 body {
-  background: var(--mist-white);
+  background: var(--blush);
 }
 
 img {
@@ -43,7 +44,7 @@ img {
 }
 
 a {
-  color: var(--brick-clay);
+  color: var(--burnt-sienna);
   text-decoration: none;
 }
 
@@ -54,11 +55,11 @@ a:hover {
 /* HERO */
 
 .hero {
-  padding: 14px 14px 8px;
+  padding: 22px 22px 10px;
 }
 
 .hero-card {
-  max-width: 1500px;
+  max-width: 1280px;
   margin: 0 auto;
   background: var(--kombu-green);
   border-radius: 26px;
@@ -106,7 +107,7 @@ a:hover {
 
 .hero-button {
   display: inline-block;
-  background: var(--brick-clay);
+  background: var(--burnt-sienna);
   color: #ffffff;
   font-weight: 700;
   padding: 12px 18px;
@@ -134,12 +135,12 @@ a:hover {
 /* LAYOUT */
 
 .app-shell {
-  max-width: 1500px;
+  max-width: 1280px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
-  padding: 10px 14px 24px;
+  gap: 18px;
+  padding: 12px 22px 34px;
 }
 
 /* PANELY */
@@ -152,6 +153,7 @@ a:hover {
 
 .panel-left {
   background: var(--panel-left-bg);
+  color: #ffffff;
 }
 
 .panel-right {
@@ -173,26 +175,30 @@ a:hover {
 .controls-section h2 {
   margin: 0 0 12px 0;
   font-size: 1.1rem;
-  color: var(--brick-clay);
 }
 
-/* FORMULÁŘOVÉ PRVKY */
+/* LEVÝ PANEL */
+
+.panel-left .section-header h2,
+.panel-left .controls-section h2,
+.panel-left label {
+  color: #ffffff;
+}
 
 label {
   display: block;
   margin: 8px 0 8px 0;
   font-size: 15px;
   font-weight: 700;
-  color: var(--text);
 }
 
 #vyhledavani,
 #filtr-kraj {
   width: 100%;
   padding: 14px 16px;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 16px;
-  background: var(--panel-white);
+  background: rgba(255, 255, 255, 0.96);
   color: var(--text);
   font-size: 16px;
   outline: none;
@@ -222,18 +228,25 @@ label {
 
 #seznam-pamatek li {
   padding: 14px 16px;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 16px;
-  background: var(--panel-soft);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
   cursor: pointer;
-  transition: background-color 0.18s ease, transform 0.18s ease;
+  transition: background-color 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
   font-size: 15px;
   line-height: 1.35;
 }
 
 #seznam-pamatek li:hover {
-  background: #f1ece4;
+  background: rgba(255, 255, 255, 0.22);
   transform: translateY(-1px);
+}
+
+#seznam-pamatek li.aktivni-pamatka {
+  background: rgba(255, 255, 255, 0.32);
+  border-color: rgba(255, 255, 255, 0.55);
+  font-weight: 700;
 }
 
 /* MAPA */
@@ -244,9 +257,9 @@ label {
 
 #map {
   width: 100%;
-  height: 300px;
+  height: 280px;
   border-radius: 20px;
-  border: 2px solid var(--brick-clay);
+  border: 2px solid var(--burnt-sienna);
   overflow: hidden;
 }
 
@@ -269,7 +282,7 @@ label {
 
 #detail-pamatky h4 {
   margin: 18px 0 10px 0;
-  color: var(--brick-clay);
+  color: var(--burnt-sienna);
   font-size: 18px;
 }
 
@@ -288,7 +301,7 @@ label {
 .prezentacni-text {
   background: var(--panel-soft);
   padding: 12px 14px;
-  border-left: 4px solid var(--brick-clay);
+  border-left: 4px solid var(--burnt-sienna);
   border-radius: 10px;
   margin-bottom: 12px;
 }
@@ -320,11 +333,11 @@ label {
 .simple-page {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 14px;
+  padding: 22px;
 }
 
 .simple-card {
-  background: var(--panel-left-bg);
+  background: #efe7e0;
   border-radius: 24px;
   box-shadow: var(--shadow);
   padding: 22px;
@@ -332,7 +345,7 @@ label {
 
 .simple-card h1 {
   margin-top: 0;
-  color: var(--brick-clay);
+  color: var(--burnt-sienna);
 }
 
 .simple-card h2 {
@@ -359,7 +372,7 @@ label {
 }
 
 .info-box strong {
-  color: var(--brick-clay);
+  color: var(--burnt-sienna);
 }
 
 .button-row {
@@ -378,7 +391,7 @@ label {
 }
 
 .primary-button {
-  background: var(--brick-clay);
+  background: var(--burnt-sienna);
   color: #ffffff;
 }
 
@@ -418,11 +431,11 @@ label {
   }
 
   .app-shell {
-    padding: 12px 14px 28px;
+    padding: 14px 22px 36px;
   }
 
   #map {
-    height: 360px;
+    height: 320px;
   }
 }
 
@@ -430,9 +443,9 @@ label {
 
 @media (min-width: 1024px) {
   .app-shell {
-    grid-template-columns: 430px 1fr;
+    grid-template-columns: 390px 1fr;
     align-items: start;
-    gap: 20px;
+    gap: 22px;
   }
 
   .panel-left {
@@ -459,7 +472,7 @@ label {
   }
 
   #map {
-    height: 420px;
+    height: 360px;
   }
 }
 
@@ -493,7 +506,7 @@ label {
   }
 
   .app-shell {
-    padding: 10px;
+    padding: 10px 10px 24px;
     gap: 14px;
   }
 
@@ -502,11 +515,15 @@ label {
   }
 
   #map {
-    height: 240px;
+    height: 220px;
   }
 
   #detail-pamatky h3 {
     font-size: 21px;
+  }
+
+  .simple-page {
+    padding: 10px;
   }
 
   .simple-card {
