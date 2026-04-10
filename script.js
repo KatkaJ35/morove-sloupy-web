@@ -1,11 +1,17 @@
 let pamatky = [];
 let mapa = null;
 let vrstvaMarkeru = null;
+let aktivniId = null;
 
 const seznam = document.getElementById("seznam-pamatek");
 const detail = document.getElementById("detail-pamatky");
 const vyhledavani = document.getElementById("vyhledavani");
 const filtrKraj = document.getElementById("filtr-kraj");
+
+const VYCHOZI_STRED = [49.8, 15.5];
+const VYCHOZI_ZOOM = 7;
+const DETAIL_ZOOM = 11;
+const MAX_AUTO_ZOOM = 8;
 
 function vytvorSlug(text) {
   return (text || "")
@@ -129,10 +135,21 @@ function zobrazSeznam(filtrovanePamatky = pamatky) {
   filtrovanePamatky.forEach((pamatka) => {
     const polozka = document.createElement("li");
     polozka.textContent = `${pamatka.nazev} – ${pamatka.mesto}`;
+    polozka.dataset.id = pamatka.id;
+
+    if (aktivniId === pamatka.id) {
+      polozka.classList.add("aktivni-pamatka");
+    }
+
     polozka.addEventListener("click", () => {
       zobrazDetailPodleId(pamatka.id);
       nastavUrlProPamatku(pamatka);
+
+      if (maPlatneSouradnice(pamatka) && mapa) {
+        mapa.setView([pamatka.lat, pamatka.lng], DETAIL_ZOOM);
+      }
     });
+
     seznam.appendChild(polozka);
   });
 }
@@ -145,9 +162,9 @@ function vzdalenostKm(lat1, lng1, lat2, lng2) {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLng / 2) *
+    Math.sin(dLng / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
@@ -269,8 +286,12 @@ function zobrazDetailPodleId(id) {
 
   if (!pamatka) {
     detail.innerHTML = `<p><em>Požadovaná památka nebyla nalezena.</em></p>`;
+    aktivniId = null;
+    zobrazSeznam(aktualneFiltrovanePamatky());
     return;
   }
+
+  aktivniId = pamatka.id;
 
   const prezentacniText = vytvorPrezentacniText(pamatka);
 
@@ -292,17 +313,20 @@ function zobrazDetailPodleId(id) {
     ${vytvorHtmlSouvisejicichPamatek(pamatka)}
   `;
 
+  zobrazSeznam(aktualneFiltrovanePamatky());
+
   const odkazy = detail.querySelectorAll(".souvisejici-link");
   odkazy.forEach((odkaz) => {
     odkaz.addEventListener("click", (event) => {
       event.preventDefault();
       const idPam = odkaz.dataset.id;
       zobrazDetailPodleId(idPam);
+
       const p = pamatky.find((item) => item.id === idPam);
       if (p) {
         nastavUrlProPamatku(p);
         if (maPlatneSouradnice(p) && mapa) {
-          mapa.setView([p.lat, p.lng], 14);
+          mapa.setView([p.lat, p.lng], DETAIL_ZOOM);
         }
       }
     });
@@ -325,17 +349,17 @@ function naplnFiltrKraju() {
 }
 
 function inicializujMapu() {
-  mapa = L.map("map").setView([49.8, 15.5], 7);
+  mapa = L.map("map").setView(VYCHOZI_STRED, VYCHOZI_ZOOM);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap contributors"
   }).addTo(mapa);
 
   vrstvaMarkeru = L.layerGroup().addTo(mapa);
-  aktualizujMapu(pamatky);
+  aktualizujMapu(pamatky, false);
 }
 
-function aktualizujMapu(filtrovanePamatky) {
+function aktualizujMapu(filtrovanePamatky, prizpusobitVyrez = true) {
   if (!vrstvaMarkeru || !mapa) return;
 
   vrstvaMarkeru.clearLayers();
@@ -356,38 +380,52 @@ function aktualizujMapu(filtrovanePamatky) {
     marker.on("click", () => {
       zobrazDetailPodleId(pamatka.id);
       nastavUrlProPamatku(pamatka);
+      mapa.setView([pamatka.lat, pamatka.lng], DETAIL_ZOOM);
     });
   });
 
+  if (!prizpusobitVyrez) {
+    return;
+  }
+
+  if (body.length === 0) {
+    mapa.setView(VYCHOZI_STRED, VYCHOZI_ZOOM);
+    return;
+  }
+
   if (body.length === 1) {
-    mapa.setView(body[0], 12);
-  } else if (body.length > 1) {
-    mapa.fitBounds(body, { padding: [30, 30] });
-  } else {
-    mapa.setView([49.8, 15.5], 7);
+    mapa.setView(body[0], DETAIL_ZOOM);
+    return;
+  }
+
+  const bounds = L.latLngBounds(body);
+  mapa.fitBounds(bounds, { padding: [30, 30] });
+
+  if (mapa.getZoom() > MAX_AUTO_ZOOM) {
+    mapa.setZoom(MAX_AUTO_ZOOM);
   }
 }
 
-function aplikujFiltry() {
+function aktualneFiltrovanePamatky() {
   const hledanyText = (vyhledavani.value || "").toLowerCase().trim();
   const vybranyKraj = filtrKraj.value;
 
-  const filtrovane = pamatky.filter((pamatka) => {
+  return pamatky.filter((pamatka) => {
     const textProHledani = `${pamatka.nazev} ${pamatka.mesto} ${pamatka.lokalita} ${pamatka.typ}`.toLowerCase();
-
     const odpovidaTextu = textProHledani.includes(hledanyText);
     const odpovidaKraji = vybranyKraj === "" || pamatka.kraj === vybranyKraj;
-
     return odpovidaTextu && odpovidaKraji;
   });
+}
 
+function aplikujFiltry() {
+  const filtrovane = aktualneFiltrovanePamatky();
   zobrazSeznam(filtrovane);
-  aktualizujMapu(filtrovane);
+  aktualizujMapu(filtrovane, true);
 
-  const idZUrl = ziskejIdZUrl();
-  if (idZUrl) {
-    const existujeVeFiltru = filtrovane.some((p) => p.id === idZUrl);
-    if (!existujeVeFiltru && filtrovane.length > 0) {
+  if (aktivniId) {
+    const aktivniJeViditelna = filtrovane.some((p) => p.id === aktivniId);
+    if (!aktivniJeViditelna) {
       detail.innerHTML = `<p><em>Aktuálně vybraná památka neodpovídá nastavenému filtru.</em></p>`;
     }
   }
@@ -406,7 +444,7 @@ function otevriPamatkuZUrl() {
   zobrazDetailPodleId(idZUrl);
 
   if (maPlatneSouradnice(pamatka) && mapa) {
-    mapa.setView([pamatka.lat, pamatka.lng], 14);
+    mapa.setView([pamatka.lat, pamatka.lng], DETAIL_ZOOM);
   }
 }
 
