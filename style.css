@@ -1,0 +1,429 @@
+:root {
+  --bg: #827461;
+  --panel: rgba(255, 255, 255, 0.94);
+  --panel-strong: #ffffff;
+  --text: #1f1f1f;
+  --accent: #9B5416;
+  --accent-dark: #7f4311;
+  --accent-soft: #efe5db;
+  --border: #d8cec3;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.10);
+  --radius-xl: 24px;
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --green: #24452f;
+  --cream: #efe5db;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* HERO */
+
+.hero {
+  padding: 14px 14px 8px;
+}
+
+.hero-card {
+  max-width: 1280px;
+  margin: 0 auto;
+  background: var(--accent);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+}
+
+.hero-top {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  align-items: center;
+}
+
+.hero-copy {
+  color: white;
+}
+
+.hero-kicker {
+  margin: 0 0 6px 0;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.92;
+}
+
+.hero h1 {
+  margin: 0 0 8px 0;
+  font-size: 30px;
+  line-height: 1.08;
+}
+
+.hero-text {
+  margin: 0;
+  max-width: 760px;
+  font-size: 15px;
+  opacity: 0.96;
+}
+
+.hero-icon-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-pin {
+  width: 92px;
+  height: 92px;
+  display: block;
+}
+
+/* MAIN LAYOUT */
+
+.app-shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 12px 14px 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.panel {
+  background: var(--panel);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.panel-left,
+.panel-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-section {
+  padding: 16px;
+}
+
+.panel-section + .panel-section {
+  border-top: 1px solid var(--border);
+}
+
+.section-header {
+  margin-bottom: 12px;
+}
+
+.section-header h2,
+.controls-section h2 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--accent);
+}
+
+/* FORMS */
+
+#vyhledavani,
+#filtr-kraj {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--panel-strong);
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: var(--text);
+}
+
+/* LIST */
+
+.list-section {
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+}
+
+#seznam-pamatek {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#seznam-pamatek li {
+  padding: 12px 14px;
+  background: var(--panel-strong);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+#seznam-pamatek li:hover {
+  background: var(--accent-soft);
+  border-color: #c79668;
+  transform: translateY(-1px);
+}
+
+/* MAP */
+
+#map {
+  width: 100%;
+  height: 340px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 2px solid var(--accent);
+}
+
+/* DETAIL */
+
+.detail-section {
+  min-height: 260px;
+}
+
+#detail-pamatky {
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+
+#detail-pamatky h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 22px;
+  color: var(--accent);
+}
+
+#detail-pamatky p {
+  margin: 8px 0;
+}
+
+#detail-pamatky a {
+  color: var(--accent);
+  font-weight: bold;
+  text-decoration: none;
+}
+
+#detail-pamatky a:hover {
+  text-decoration: underline;
+}
+
+#detail-pamatky img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin-top: 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.leaflet-popup-content strong {
+  color: var(--accent);
+}
+
+/* TABLET */
+
+@media (min-width: 768px) {
+  .hero {
+  padding: 14px 14px 8px;
+}
+
+.hero-card {
+  max-width: 1280px;
+  margin: 0 auto;
+  background: var(--accent);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+}
+
+.hero-top {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.hero-copy {
+  color: white;
+}
+
+.hero-kicker {
+  margin: 0 0 6px 0;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.92;
+}
+
+.hero h1 {
+  margin: 0 0 8px 0;
+  font-size: 30px;
+  line-height: 1.08;
+}
+
+.hero-text {
+  margin: 0;
+  max-width: 760px;
+  font-size: 15px;
+  opacity: 0.96;
+}
+
+.hero-cz-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-cz-image {
+  width: 180px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .hero-cz-image {
+    width: 220px;
+  }
+}
+
+.hero-cz {
+  width: 180px;
+  height: auto;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .hero {
+    padding: 16px 20px 10px;
+  }
+
+  .hero-card {
+    padding: 18px 24px;
+  }
+
+  .hero-top {
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+  }
+
+  .hero h1 {
+    font-size: 42px;
+  }
+
+  .hero-text {
+    font-size: 16px;
+  }
+
+  .hero-cz {
+    width: 220px;
+  }
+}
+
+  .app-shell {
+    padding: 14px 20px 28px;
+    gap: 18px;
+  }
+
+  #map {
+    height: 420px;
+  }
+}
+
+/* DESKTOP */
+
+@media (min-width: 1024px) {
+  .app-shell {
+    grid-template-columns: 360px 1fr;
+    align-items: start;
+  }
+
+  .panel-left {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 32px);
+  }
+
+  .controls-section {
+    flex: 0 0 auto;
+  }
+
+  .list-section {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  #seznam-pamatek {
+    overflow-y: auto;
+    padding-right: 4px;
+    max-height: calc(100vh - 320px);
+  }
+
+  #map {
+    height: 460px;
+  }
+
+  #detail-pamatky {
+    min-height: 280px;
+  }
+}
+.souvisejici-blok {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.souvisejici-blok h4 {
+  margin: 0 0 10px 0;
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.souvisejici-seznam {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.souvisejici-seznam li {
+  margin-bottom: 8px;
+}
+
+.souvisejici-link {
+  color: var(--accent);
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.souvisejici-link:hover {
+  text-decoration: underline;
+}
+.prezentacni-text {
+  margin: 0 0 14px 0;
+  padding: 12px 14px;
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+}

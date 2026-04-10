@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Morové sloupy v České republice</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+<body>
+  <header class="hero">
+  <div class="hero-card">
+    <div class="hero-top">
+      <div class="hero-copy">
+        <p class="hero-kicker">Digitální katalog památek</p>
+        <h1>Morové sloupy v České republice</h1>
+        <p class="hero-text">
+          Interaktivní přehled morových sloupů s mapou, filtrováním, detailem památek a možností navigace.
+        </p>
+      </div>
+
+      <div class="hero-cz-wrap" aria-hidden="true">
+  <img src="cr-obrys.png" alt="" class="hero-cz-image">
+</div>
+          <path
+            d="M38 92
+               L46 78 L64 74 L72 62 L92 54 L110 56 L122 46 L144 49 L156 40
+               L178 44 L198 40 L214 50 L234 53 L248 63 L258 78 L266 96 L261 112
+               L244 120 L232 132 L212 136 L194 132 L176 138 L160 133 L146 140
+               L128 136 L110 139 L95 130 L79 126 L66 114 L57 101 L56 88 L47 80 Z"
+            fill="#efe5db"
+            stroke="#24452f"
+            stroke-width="4"
+            stroke-linejoin="round"
+          />
+
+          <g transform="translate(152 92)">
+            <path
+              d="M0 -20
+                 C11 -20 19 -12 19 -2
+                 C19 12 5 27 0 35
+                 C-5 27 -19 12 -19 -2
+                 C-19 -12 -11 -20 0 -20 Z"
+              fill="#24452f"
+            />
+            <circle cx="0" cy="-5" r="10" fill="#efe5db"/>
+            <rect x="-5" y="-10" width="3" height="3" fill="#24452f"/>
+            <rect x="-1" y="-10" width="3" height="3" fill="#24452f"/>
+            <rect x="3" y="-10" width="3" height="3" fill="#24452f"/>
+
+            <rect x="-5" y="-6" width="3" height="3" fill="#24452f"/>
+            <rect x="3" y="-6" width="3" height="3" fill="#24452f"/>
+
+            <rect x="-5" y="-2" width="3" height="3" fill="#24452f"/>
+            <rect x="-1" y="-2" width="3" height="3" fill="#24452f"/>
+            <rect x="3" y="-2" width="3" height="3" fill="#24452f"/>
+
+            <rect x="-1" y="2" width="3" height="3" fill="#24452f"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</header>
+
+  <main class="app-shell">
+    <aside class="panel panel-left">
+      <section class="panel-section controls-section">
+        <h2>Vyhledávání</h2>
+
+        <input
+          type="text"
+          id="vyhledavani"
+          placeholder="Hledat podle názvu nebo města"
+        >
+
+        <label for="filtr-kraj">Filtrovat podle kraje</label>
+        <select id="filtr-kraj">
+          <option value="">Všechny kraje</option>
+        </select>
+      </section>
+
+      <section class="panel-section list-section">
+        <div class="section-header">
+          <h2>Seznam památek</h2>
+        </div>
+        <ul id="seznam-pamatek"></ul>
+      </section>
+    </aside>
+
+    <section class="panel panel-right">
+      <section class="panel-section map-section">
+        <div class="section-header">
+          <h2>Mapa památek</h2>
+        </div>
+        <div id="map"></div>
+      </section>
+
+      <section class="panel-section detail-section">
+        <div class="section-header">
+          <h2>Detail památky</h2>
+        </div>
+        <div id="detail-pamatky">
+          <p>Vyber památku ze seznamu nebo klikni na bod v mapě.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
