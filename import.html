@@ -1,1 +1,101 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Import dalších památek | Morové sloupy v České republice</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-card">
+      <div class="hero-top">
+        <div class="hero-copy">
+          <p class="hero-kicker">Informační centra</p>
+          <h1>Formulář pro doplnění dalších památek</h1>
+          <p class="hero-text">
+            Tato stránka slouží pracovníkům informačních center a dalším spolupracujícím institucím
+            pro přípravu nových záznamů do katalogu morových sloupů.
+          </p>
 
+          <div class="hero-actions">
+            <a href="index.html" class="hero-button">Zpět na katalog</a>
+          </div>
+        </div>
+
+        <div class="hero-cz-wrap" aria-hidden="true">
+          <img src="cr-obrys.png" alt="" class="hero-cz-image">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="simple-page">
+    <section class="simple-card">
+      <h1>Jak doplnit další památku</h1>
+
+      <p>
+        Nové památky se v této verzi systému nepřidávají přímo přes online administraci.
+        Pro doplnění dalších záznamů je připravena excelová šablona, kterou je třeba vyplnit
+        podle níže uvedených pravidel.
+      </p>
+
+      <div class="info-box">
+        <strong>Důležité:</strong>
+        Každý řádek v excelové šabloně představuje jednu památku. Je třeba zachovat názvy sloupců
+        a nevkládat více památek do jednoho řádku.
+      </div>
+
+      <h2>Jaké informace vyplňovat</h2>
+      <ul>
+        <li><strong>id</strong> – jedinečný identifikátor památky bez diakritiky, malými písmeny, se spojovníky</li>
+        <li><strong>nazev</strong> – oficiální nebo běžně užívaný název památky</li>
+        <li><strong>typ</strong> – např. morový sloup, mariánský sloup, trojiční sloup</li>
+        <li><strong>mesto</strong> – obec nebo město</li>
+        <li><strong>kraj</strong> – příslušný kraj</li>
+        <li><strong>lokalita</strong> – náměstí, ulice nebo bližší umístění</li>
+        <li><strong>rok</strong> – rok nebo období vzniku</li>
+        <li><strong>epidemie</strong> – s jakou epidemií památka souvisí</li>
+        <li><strong>duvod</strong> – důvod vzniku nebo připomínaná událost</li>
+        <li><strong>ikonografie</strong> – hlavní ikonografické prvky</li>
+        <li><strong>patroni</strong> – významní světci nebo další zobrazené postavy</li>
+        <li><strong>foto</strong> – odkaz na fotografii nebo zdrojovou stránku</li>
+        <li><strong>zdroj</strong> – textový údaj o použitém zdroji</li>
+        <li><strong>lat</strong> – zeměpisná šířka</li>
+        <li><strong>lng</strong> – zeměpisná délka</li>
+      </ul>
+
+      <h2>Technická pravidla pro vyplnění</h2>
+      <ol>
+        <li>Vyplňujte vždy jednu památku na jeden řádek.</li>
+        <li>Neměňte názvy sloupců v šabloně.</li>
+        <li>Neslučujte buňky a nevkládejte vlastní formátování.</li>
+        <li>Souřadnice zapisujte čísly do polí <strong>lat</strong> a <strong>lng</strong>.</li>
+        <li>Pokud některý údaj není známý, ponechte pole prázdné.</li>
+        <li>U pole <strong>foto</strong> je vhodné uvést přímý obrázek; pokud není k dispozici, lze uvést odkaz na zdrojovou stránku.</li>
+        <li>Hodnota <strong>id</strong> musí být unikátní a nesmí se opakovat.</li>
+      </ol>
+
+      <h2>Doporučený způsob tvorby ID</h2>
+      <div class="info-box">
+        <p>
+          ID zapisujte ve tvaru například:
+          <strong>olomouc-sloup-nejsvetejsi-trojice</strong>
+        </p>
+        <p>
+          Používejte pouze malá písmena bez diakritiky, čísla a spojovníky.
+        </p>
+      </div>
+
+      <div class="button-row">
+        <a href="katalog_morove_pamatky.xlsx" class="primary-button" download>
+          Stáhnout excelovou šablonu
+        </a>
+        <a href="index.html" class="secondary-button">
+          Zpět na katalog památek
+        </a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
